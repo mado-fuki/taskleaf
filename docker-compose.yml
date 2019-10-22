@@ -7,13 +7,21 @@ services:
       MYSQL_DATABASE: root
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   web:
-    build: .
+    build: .  # ビルドするローカルのDockerファイルの場所を指定する
+     # docker-composeコマンドの引数にコマンドが渡されなかった場合に実行される
     command: bundle exec rails s -p 3000 -b '0.0.0.0'
     volumes:
+      # カレントフォルダ(docker-compose.ymlが置いてあるフォルダ)をコンテナの/app_nameにマウントしている
       - .:/app_name
     ports:
       - "3000:3000"
-    links:
+      # 先にdbを起動するように設定
+    depends_on:
       - db
+      # mysql_dataというvolumeを作成
+volumes:
+  mysql_data:
